@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LYCC — Laurier Youth Case Competition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy: #050d1a;
+      --navy-mid: #0a1628;
+      --navy-light: #0f2040;
+      --blue: #185fa5;
+      --blue-mid: #378add;
+      --blue-light: #85b7eb;
+      --blue-pale: #b5d4f4;
+      --white: #ffffff;
+      --white-80: rgba(255,255,255,0.8);
+      --white-60: rgba(255,255,255,0.6);
+      --white-40: rgba(255,255,255,0.4);
+      --white-20: rgba(255,255,255,0.2);
+      --white-10: rgba(255,255,255,0.1);
+      --accent-border: rgba(55,138,221,0.25);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── PAGE SYSTEM ─── */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ─── SHARED BACKGROUND ─── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(55,138,221,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55,138,221,0.07) 1px, transparent 1px);
+      background-size: 52px 52px;
+      animation: drift 40s ease-in-out infinite;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 6s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(24,95,165,0.32) 0%, transparent 70%);
+      top: -150px; left: -150px;
+      filter: blur(60px);
+      animation: float 16s ease-in-out infinite, glow 8s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(55,138,221,0.18) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      filter: blur(60px);
+      animation: float-slow 20s ease-in-out infinite, glow 10s ease-in-out infinite 1s;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(83,74,183,0.22) 0%, transparent 70%);
+      top: 40%; left: 58%;
+      filter: blur(50px);
+      animation: drift 24s ease-in-out infinite, glow 12s ease-in-out infinite 2s;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      background: rgba(5,13,26,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 0.5px solid var(--accent-border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.5px;
+      user-select: none;
+    }
+    .nav-logo-mark {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--blue-mid);
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(55,138,221,0.4); }
+      50% { opacity: 0.8; transform: scale(0.85); box-shadow: 0 0 0 4px rgba(55,138,221,0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-15px) rotate(1deg); }
+      66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    @keyframes drift {
+      0% { transform: translateX(0px) translateY(0px); }
+      25% { transform: translateX(10px) translateY(-5px); }
+      50% { transform: translateX(-5px) translateY(10px); }
+      75% { transform: translateX(-10px) translateY(-10px); }
+      100% { transform: translateX(0px) translateY(0px); }
+    }
+
+    @keyframes color-shift {
+      0%, 100% { background: linear-gradient(140deg, var(--navy) 25%, #85b7eb 65%, #378add 100%); }
+      50% { background: linear-gradient(140deg, var(--navy) 25%, #b5d4f4 65%, #185fa5 100%); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-links li a {
+      color: var(--white-60);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+      cursor: pointer;
+    }
+    .nav-links li a:hover,
+    .nav-links li a.active {
+      color: var(--white);
+      background: var(--white-10);
+    }
+
+    .nav-btn {
+      background: rgba(55,138,221,0.15);
+      border: 0.5px solid rgba(55,138,221,0.4);
+      color: var(--blue-light);
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-btn:hover { background: rgba(55,138,221,0.3); color: var(--white); }
+
+    /* ─── BANNER ─── */
+    .banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 24px;
+      background: linear-gradient(90deg, rgba(24,95,165,0.18) 0%, rgba(55,138,221,0.14) 50%, rgba(24,95,165,0.18) 100%);
+      border-bottom: 0.5px solid var(--accent-border);
+      font-size: 13px;
+      color: var(--white-60);
+    }
+    .banner-pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--blue-mid);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+    .banner strong { color: var(--blue-light); font-weight: 500; }
+
+    /* ─── HERO PAGE ─── */
+    .hero-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 32px 72px;
+      min-height: calc(100vh - 100px);
+      position: relative;
+    }
+
+    .hero-lines {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      opacity: 0.1;
+      animation: float-slow 30s ease-in-out infinite;
+    }
+
+    .corner-mark {
+      position: absolute;
+      width: 44px; height: 44px;
+      pointer-events: none;
+      animation: float-slow 16s ease-in-out infinite;
+    }
+    .corner-mark.tl { top: 24px; left: 40px; border-top: 1px solid rgba(55,138,221,0.35); border-left: 1px solid rgba(55,138,221,0.35); }
+    .corner-mark.br { bottom: 24px; right: 40px; border-bottom: 1px solid rgba(55,138,221,0.35); border-right: 1px solid rgba(55,138,221,0.35); }
+    .corner-mark.tr { top: 24px; right: 40px; border-top: 1px solid rgba(55,138,221,0.35); border-right: 1px solid rgba(55,138,221,0.35); }
+    .corner-mark.bl { bottom: 24px; left: 40px; border-bottom: 1px solid rgba(55,138,221,0.35); border-left: 1px solid rgba(55,138,221,0.35); }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(55,138,221,0.08);
+      border: 0.5px solid rgba(55,138,221,0.3);
+      border-radius: 100px;
+      padding: 7px 18px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--blue-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      font-family: var(--font-display);
+    }
+    .eyebrow-bar { width: 20px; height: 1px; background: var(--blue-mid); }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(96px, 16vw, 172px);
+      font-weight: 800;
+      letter-spacing: -6px;
+      line-height: 0.88;
+      margin-bottom: 14px;
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+      color: var(--blue-light);
+      background: none;
+      animation: float 8s ease-in-out infinite, glow 6s ease-in-out infinite;
+    }
+
+    @supports (-webkit-background-clip: text) {
+      .hero-title {
+        background: linear-gradient(140deg, #ffffff 20%, #85b7eb 55%, #378add 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+    }
+
+    @supports not (-webkit-background-clip: text) {
+      .hero-title {
+        color: var(--blue-light);
+        background: none;
+      }
+    }
+
+    .hero-full-name {
+      font-size: 12px;
+      color: var(--white-35, rgba(255,255,255,0.35));
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 30px;
+      font-family: var(--font-display);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(18px, 2.5vw, 24px);
+      font-weight: 300;
+      color: var(--white-80);
+      margin-bottom: 12px;
+      max-width: 580px;
+      line-height: 1.45;
+    }
+
+    .hero-tagline {
+      font-size: 14px;
+      color: var(--white-40);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      padding: 14px 38px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-body);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 0 0 0.5px rgba(55,138,221,0.4), 0 8px 32px rgba(24,95,165,0.4);
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+    }
+    .btn-primary:hover { background: #1e72c5; transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--white-80);
+      border: 0.5px solid var(--white-20);
+      padding: 14px 38px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 400;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(55,138,221,0.55);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white-50, rgba(255,255,255,0.5));
+      font-size: 13px;
+    }
+    .stat-icon {
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      background: rgba(55,138,221,0.1);
+      border: 0.5px solid rgba(55,138,221,0.22);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      animation: float 10s ease-in-out infinite;
+    }
+    .stat-div { width: 1px; height: 26px; background: var(--white-10); }
+
+    /* ─── SECTION SHARED ─── */
+    .section {
+      padding: 96px 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--blue-light);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      font-family: var(--font-display);
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      animation: float 6s ease-in-out infinite;
+    }
+    .section-sub {
+      font-size: 17px;
+      color: var(--white-60);
+      max-width: 560px;
+      line-height: 1.65;
+      margin-bottom: 56px;
+      font-weight: 300;
+    }
+
+    .divider {
+      width: 100%;
+      height: 0.5px;
+      background: var(--accent-border);
+      margin: 0 64px;
+      width: calc(100% - 128px);
+    }
+
+    /* ─── ABOUT ─── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 64px;
+    }
+    .about-card {
+      background: rgba(255,255,255,0.03);
+      border: 0.5px solid var(--accent-border);
+      border-radius: 14px;
+      padding: 32px;
+      transition: border-color 0.25s, background 0.25s;
+      animation: float-slow 12s ease-in-out infinite;
+    }
+    .about-card:hover {
+      border-color: rgba(55,138,221,0.45);
+      background: rgba(55,138,221,0.05);
+    }
+    .about-card-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: rgba(55,138,221,0.12);
+      border: 0.5px solid rgba(55,138,221,0.25);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .about-card h3 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .about-card p {
+      font-size: 14px;
+      color: var(--white-60);
+      line-height: 1.7;
+    }
+
+    .values-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--accent-border);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 0.5px solid var(--accent-border);
+    }
+    .value-block {
+      background: var(--navy-mid);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .value-num {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--blue-mid);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .value-label {
+      font-size: 13px;
+      color: var(--white-50, rgba(255,255,255,0.5));
+    }
+
+    /* ─── COMPETITION ─── */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, var(--blue-mid) 0%, transparent 100%);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 40px;
+      padding-left: 24px;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -34px; top: 6px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--navy);
+      border: 2px solid var(--blue-mid);
+    }
+    .timeline-dot.active {
+      background: var(--blue-mid);
+      box-shadow: 0 0 0 4px rgba(55,138,221,0.2);
+    }
+    .timeline-label {
+      font-size: 11px;
+      color: var(--blue-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-family: var(--font-display);
+    }
+    .timeline-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--white-60);
+      line-height: 1.65;
+      max-width: 520px;
+    }
+
+    .comp-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .format-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .format-card {
+      background: rgba(255,255,255,0.03);
+      border: 0.5px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      animation: float 7s ease-in-out infinite;
+    }
+    .format-num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      color: rgba(55,138,221,0.3);
+      line-height: 1;
+      flex-shrink: 0;
+      width: 40px;
+    }
+    .format-card h4 {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .format-card p {
+      font-size: 13px;
+      color: var(--white-60);
+      line-height: 1.6;
+    }
+
+    /* ─── SPONSORS ─── */
+    .sponsor-tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+    .tier-label {
+      font-size: 11px;
+      color: var(--white-40);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+    }
+    .tier-label::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--accent-border);
+    }
+    .tier-label.gold { color: #d4a843; }
+    .tier-label.silver { color: #9ea8b8; }
+    .tier-label.bronze { color: #b07645; }
+
+    .sponsor-grid {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .sponsor-slot {
+      flex: 1;
+      min-width: 160px;
+      border: 0.5px dashed rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 100px;
+      transition: border-color 0.2s;
+      animation: float-slow 10s ease-in-out infinite;
+    }
+    .sponsor-slot:hover { border-color: rgba(55,138,221,0.4); }
+    .sponsor-slot-text {
+      font-size: 12px;
+      color: var(--white-30, rgba(255,255,255,0.3));
+      text-align: center;
+    }
+
+    .sponsor-cta {
+      margin-top: 64px;
+      background: rgba(55,138,221,0.06);
+      border: 0.5px solid var(--accent-border);
+      border-radius: 16px;
+      padding: 48px;
+      text-align: center;
+    }
+    .sponsor-cta h3 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .sponsor-cta p {
+      font-size: 15px;
+      color: var(--white-60);
+      margin-bottom: 28px;
+      line-height: 1.65;
+    }
+
+    /* ─── TEAM ─── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .team-card {
+      background: rgba(255,255,255,0.03);
+      border: 0.5px solid var(--accent-border);
+      border-radius: 14px;
+      padding: 28px 24px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.2s;
+      animation: float 8s ease-in-out infinite;
+    }
+    .team-card:hover {
+      border-color: rgba(55,138,221,0.45);
+      transform: translateY(-4px);
+    }
+    .avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      border: 0.5px solid rgba(55,138,221,0.3);
+    }
+    .avatar.blue { background: rgba(24,95,165,0.25); color: var(--blue-light); }
+    .avatar.purple { background: rgba(83,74,183,0.25); color: #afa9ec; }
+    .avatar.teal { background: rgba(13,110,86,0.25); color: #5dcaa5; }
+    .avatar.coral { background: rgba(216,90,48,0.25); color: #f0997b; }
+    .team-card h4 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .team-card .role {
+      font-size: 12px;
+      color: var(--blue-light);
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      font-family: var(--font-display);
+    }
+    .team-card .bio {
+      font-size: 13px;
+      color: var(--white-50, rgba(255,255,255,0.5));
+      line-height: 1.6;
+    }
+
+    /* ─── CONTACT ─── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .contact-info h3 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .contact-info p {
+      font-size: 15px;
+      color: var(--white-60);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .contact-detail {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--white-70, rgba(255,255,255,0.7));
+    }
+    .contact-detail-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: rgba(55,138,221,0.1);
+      border: 0.5px solid rgba(55,138,221,0.22);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 12px;
+      color: var(--white-50, rgba(255,255,255,0.5));
+      letter-spacing: 0.05em;
+      font-family: var(--font-display);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: rgba(255,255,255,0.04);
+      border: 0.5px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--white);
+      font-family: var(--font-body);
+      transition: border-color 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: rgba(55,138,221,0.55);
+    }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+    .form-group select option { background: #0a1628; }
+
+    .form-submit {
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 20px rgba(24,95,165,0.35);
+      width: 100%;
+    }
+    .form-submit:hover { background: #1e72c5; transform: translateY(-1px); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 0.5px solid var(--accent-border);
+      padding: 32px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--white-40);
+    }
+    footer a { color: var(--blue-light); text-decoration: none; }
+
+    /* ─── NOTIFY MODAL ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5,13,26,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--navy-mid);
+      border: 0.5px solid rgba(55,138,221,0.3);
+      border-radius: 18px;
+      padding: 48px;
+      max-width: 440px;
+      width: 90%;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      background: var(--white-10);
+      border: none;
+      color: var(--white-60);
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: var(--white-20); color: var(--white); }
+    .modal h3 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .modal p {
+      font-size: 14px;
+      color: var(--white-60);
+      margin-bottom: 28px;
+      line-height: 1.65;
+    }
+    .modal-input-row {
+      display: flex;
+      gap: 10px;
+    }
+    .modal-input-row input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 0.5px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--white);
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-input-row input:focus { border-color: rgba(55,138,221,0.55); }
+    .modal-input-row button {
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-body);
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .modal-input-row button:hover { background: #1e72c5; }
+    .modal-success {
+      display: none;
+      text-align: center;
+      padding: 16px 0;
+    }
+    .modal-success-icon {
+      width: 48px; height: 48px;
+      background: rgba(55,138,221,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .modal-success h4 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .modal-success p { font-size: 14px; color: var(--white-60); margin: 0; }
+
+    /* ─── PAGE TRANSITIONS ─── */
+    .page { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .section { padding: 64px 24px; }
+      .hero-section { padding: 60px 24px 48px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .comp-grid { grid-template-columns: 1fr; gap: 40px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .values-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+      .hero-title { letter-spacing: -3px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Shared background -->
+<div class="bg-layer">
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    <span class="nav-logo-mark"></span>
+    LYCC
+  </div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('about'); return false;" id="nav-about">About</a></li>
+    <li><a href="#" onclick="showPage('competition'); return false;" id="nav-competition">Competition</a></li>
+    <li><a href="#" onclick="showPage('sponsors'); return false;" id="nav-sponsors">Sponsors</a></li>
+    <li><a href="#" onclick="showPage('team'); return false;" id="nav-team">Team</a></li>
+    <li><a href="#" onclick="showPage('contact'); return false;" id="nav-contact">Contact</a></li>
+  </ul>
+  <button class="nav-btn" onclick="openModal()">Get Notified</button>
+</nav>
+
+<!-- Banner -->
+<div class="banner">
+  <span class="banner-pulse"></span>
+  <strong>Launching Fall 2026</strong>&nbsp;· Waterloo Region, Ontario
+</div>
+
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero-section">
+    <!-- Corner marks -->
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark tr"></div>
+    <div class="corner-mark bl"></div>
+    <div class="corner-mark br"></div>
+
+    <!-- Decorative SVG lines -->
+    <svg class="hero-lines" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="800" x2="460" y2="0" stroke="#378add" stroke-width="1"/>
+      <line x1="240" y1="800" x2="700" y2="0" stroke="#378add" stroke-width="0.5"/>
+      <line x1="1400" y1="0" x2="940" y2="800" stroke="#378add" stroke-width="1"/>
+      <line x1="1160" y1="0" x2="700" y2="800" stroke="#378add" stroke-width="0.5"/>
+      <circle cx="140" cy="200" r="3" fill="#378add" opacity="0.5"/>
+      <circle cx="1260" cy="600" r="3" fill="#378add" opacity="0.5"/>
+      <circle cx="260" cy="540" r="2" fill="#85b7eb" opacity="0.5"/>
+      <circle cx="1100" cy="220" r="2" fill="#85b7eb" opacity="0.5"/>
+      <circle cx="700" cy="50" r="2.5" fill="#378add" opacity="0.35"/>
+      <rect x="60" y="440" width="14" height="14" rx="2" fill="none" stroke="#378add" stroke-width="0.8" opacity="0.35" transform="rotate(45 67 447)"/>
+      <rect x="1310" y="310" width="14" height="14" rx="2" fill="none" stroke="#378add" stroke-width="0.8" opacity="0.35" transform="rotate(45 1317 317)"/>
+    </svg>
+
+    <div class="hero-eyebrow">
+      <span class="eyebrow-bar"></span>
+      Business Case Competition
+      <span class="eyebrow-bar"></span>
+    </div>
+
+    <h1 class="hero-title">LYCC</h1>
+    <p class="hero-full-name">Laurier Youth Case Competition</p>
+
+    <p class="hero-subtitle">A Business Case Competition for High School Students</p>
+    <p class="hero-tagline">Solve real-world business problems. Present your ideas. Compete with the best.</p>
+
+    <div class="btn-group">
+      <button class="btn-primary">Coming Soon</button>
+      <button class="btn-secondary" onclick="openModal()">Get Notified →</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-icon">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <circle cx="5.5" cy="5" r="2.2" stroke="#378add" stroke-width="1.2"/>
+            <circle cx="10.5" cy="5" r="2.2" stroke="#378add" stroke-width="1.2"/>
+            <path d="M1 13c0-2.2 2-3.5 4.5-3.5S10 10.8 10 13" stroke="#378add" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M11 9.5c1.8.3 4 1.2 4 3.5" stroke="#378add" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        ~100 Participants
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <rect x="1.5" y="1.5" width="13" height="13" rx="2" stroke="#378add" stroke-width="1.2"/>
+            <path d="M4.5 8h7M8 4.5v7" stroke="#378add" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        Teams of 3–5
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <polygon points="8,2 10,6 14,6.5 11,9.5 11.5,14 8,12 4.5,14 5,9.5 2,6.5 6,6" stroke="#378add" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        Judged by students, professionals &amp; professors
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Laurier Youth Case Competition · Waterloo Region, Ontario</span>
+    <span>Made by high school students</span>
+  </footer>
+</div>
+
+<!-- ═══════════════ ABOUT PAGE ═══════════════ -->
+<div class="page" id="page-about">
+  <div class="section">
+    <p class="section-label">Our Mission</p>
+    <h2 class="section-title">Built by students,<br>for students.</h2>
+    <p class="section-sub">LYCC is a student-run business case competition designed to give high schoolers a taste of real-world problem solving, strategic thinking, and professional presenting.</p>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="#378add" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Real-World Problems</h3>
+        <p>Case challenges are modelled on actual business dilemmas faced by companies today — from supply chain disruption to go-to-market strategy and sustainability decisions.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="#378add" stroke-width="1.5"/>
+            <path d="M10 6v5l3 2" stroke="#378add" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Day 1 · Learning & Case Release</h3>
+        <p>Opening ceremony gathers everyone together. Teams receive the case, enjoy provided snacks, and begin brainstorming before continuing their work independently.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M3 17l4-4 4 4 6-10" stroke="#378add" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Day 2 · Presentations & Finals</h3>
+        <p>Teams return at their scheduled time to present solutions to a panel of judges. Top teams advance to finals, where strategies are evaluated and winners are selected.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="5" width="16" height="12" rx="2" stroke="#378add" stroke-width="1.5"/>
+            <path d="M6 5V4a2 2 0 014 0v1" stroke="#378add" stroke-width="1.5"/>
+            <path d="M6 11h8M6 14h5" stroke="#378add" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>No Experience Needed</h3>
+        <p>LYCC is designed to be accessible. Whether you're new to business concepts or already experienced, the competition provides a supportive environment to learn and compete.</p>
+      </div>
+    </div>
+
+    <div class="values-row">
+      <div class="value-block">
+        <div class="value-num">2</div>
+        <div class="value-label">Days of competition</div>
+      </div>
+      <div class="value-block">
+        <div class="value-num">~100</div>
+        <div class="value-label">Expected participants</div>
+      </div>
+      <div class="value-block">
+        <div class="value-num">3–5</div>
+        <div class="value-label">Students per team</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Laurier Youth Case Competition · Waterloo Region, Ontario</span>
+    <span>Made by high school students</span>
+  </footer>
+</div>
+
+<!-- ═══════════════ COMPETITION PAGE ═══════════════ -->
+<div class="page" id="page-competition">
+  <div class="section">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">The Competition</h2>
+    <p class="section-sub">One day. One case. Your best thinking. Here's exactly how the day unfolds.</p>
+
+    <div class="comp-grid">
+      <div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot active"></div>
+            <div class="timeline-label">Registration Opens — Summer 2026</div>
+            <div class="timeline-title">Form Your Team</div>
+            <div class="timeline-desc">Assemble a team of 3 to 5 high school students. If you do not have a team, sign up individually and we will pair you with others. No prior business experience required — just curiosity and a willingness to think critically.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Saturday — Opening Ceremony</div>
+            <div class="timeline-title">Receive the Case</div>
+            <div class="timeline-desc">Teams receive a real business scenario at the start of the day. So it's time to build your solution.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Sunday Afternoon — Case Day</div>
+            <div class="timeline-title">Present to Judges</div>
+            <div class="timeline-desc">Each team delivers a 15-minute presentation followed by a Q&A session. Judges evaluate clarity, strategy, creativity, and delivery.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Sunday Evening — Case Day</div>
+            <div class="timeline-title">Awards &amp; Closing</div>
+            <div class="timeline-desc">Winners are announced and prizes are awarded. All participants receive feedback from judges and connect with mentors and sponsors.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="format-cards">
+        <div class="format-card">
+          <div class="format-num">01</div>
+          <div>
+            <h4>Eligibility</h4>
+            <p>Open to all high school students. Teams must have 3–5 members from the same or different schools.</p>
+          </div>
+        </div>
+        <div class="format-card">
+          <div class="format-num">02</div>
+          <div>
+            <h4>The Case</h4>
+            <p>Cases are realistic business problems. You might advise a startup on pricing, help a company enter a new market, or tackle a sustainability challenge.</p>
+          </div>
+        </div>
+        <div class="format-card">
+          <div class="format-num">03</div>
+          <div>
+            <h4>Judging Criteria</h4>
+            <p>Teams are scored on analysis depth, solution viability, presentation quality, and how well you handle judge questions.</p>
+          </div>
+        </div>
+        <div class="format-card">
+          <div class="format-num">04</div>
+          <div>
+            <h4>Prizes</h4>
+            <p>Details coming soon. Prizes will be awarded to top-placing teams, with recognition for best presentation, most creative solution, and more.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Laurier Youth Case Competition · Waterloo Region, Ontario</span>
+    <span>Made by high school students</span>
+  </footer>
+</div>
+
+<!-- ═══════════════ SPONSORS PAGE ═══════════════ -->
+<div class="page" id="page-sponsors">
+  <div class="section">
+    <p class="section-label">Our Partners</p>
+    <h2 class="section-title">Sponsors &amp; Partners</h2>
+    <p class="section-sub">LYCC is made possible by the support of organizations who believe in developing the next generation of business thinkers.</p>
+
+    <div class="sponsor-tiers">
+      <div>
+        <div class="tier-label gold">Gold — Presenting Sponsor</div>
+        <div class="sponsor-grid">
+          <div class="sponsor-slot" style="min-height: 130px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="rgba(212,168,67,0.4)" stroke-width="1.2" stroke-dasharray="3 3"/>
+              <path d="M12 7v5l3 3" stroke="rgba(212,168,67,0.4)" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <span class="sponsor-slot-text" style="color: rgba(212,168,67,0.4);">Your company here</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="tier-label silver">Silver</div>
+        <div class="sponsor-grid">
+          <div class="sponsor-slot">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="4" stroke="rgba(158,168,184,0.35)" stroke-width="1.2" stroke-dasharray="3 3"/>
+            </svg>
+            <span class="sponsor-slot-text">Sponsor slot</span>
+          </div>
+          <div class="sponsor-slot">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="4" stroke="rgba(158,168,184,0.35)" stroke-width="1.2" stroke-dasharray="3 3"/>
+            </svg>
+            <span class="sponsor-slot-text">Sponsor slot</span>
+          </div>
+          <div class="sponsor-slot">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="4" stroke="rgba(158,168,184,0.35)" stroke-width="1.2" stroke-dasharray="3 3"/>
+            </svg>
+            <span class="sponsor-slot-text">Sponsor slot</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="tier-label bronze">Bronze</div>
+        <div class="sponsor-grid">
+          <div class="sponsor-slot" style="min-height: 80px;">
+            <span class="sponsor-slot-text" style="color: rgba(176,118,69,0.4);">Sponsor</span>
+          </div>
+          <div class="sponsor-slot" style="min-height: 80px;">
+            <span class="sponsor-slot-text" style="color: rgba(176,118,69,0.4);">Sponsor</span>
+          </div>
+          <div class="sponsor-slot" style="min-height: 80px;">
+            <span class="sponsor-slot-text" style="color: rgba(176,118,69,0.4);">Sponsor</span>
+          </div>
+          <div class="sponsor-slot" style="min-height: 80px;">
+            <span class="sponsor-slot-text" style="color: rgba(176,118,69,0.4);">Sponsor</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sponsor-cta">
+      <h3>Interested in sponsoring?</h3>
+      <p>Support the next generation of business leaders in Waterloo Region. Reach out to discuss sponsorship packages and how your organization can get involved.</p>
+      <button class="btn-primary" onclick="showPage('contact')">Get in Touch →</button>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Laurier Youth Case Competition · Waterloo Region, Ontario</span>
+    <span>Made by high school students</span>
+  </footer>
+</div>
+
+<!-- ═══════════════ TEAM PAGE ═══════════════ -->
+<div class="page" id="page-team">
+  <div class="section">
+    <p class="section-label">The People Behind LYCC</p>
+    <h2 class="section-title">Meet the Team</h2>
+    <p class="section-sub">LYCC is organized entirely by high school students passionate about business, leadership, and creating opportunities for their peers.</p>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="avatar blue">OA</div>
+        <h4>Organizer A</h4>
+        <div class="role">Co-Founder &amp; Director</div>
+        <p class="bio">Passionate about entrepreneurship and building community events that leave a lasting impact.</p>
+      </div>
+      <div class="team-card">
+        <div class="avatar purple">OB</div>
+        <h4>Organizer B</h4>
+        <div class="role">Co-Founder &amp; Operations</div>
+        <p class="bio">Handles logistics, venue coordination, and making sure everything runs smoothly on competition day.</p>
+      </div>
+      <div class="team-card">
+        <div class="avatar teal">OC</div>
+        <h4>Organizer C</h4>
+        <div class="role">Case Director</div>
+        <p class="bio">Leads case development and ensures challenges reflect real, relevant business problems participants will love.</p>
+      </div>
+      <div class="team-card">
+        <div class="avatar coral">OD</div>
+        <h4>Organizer D</h4>
+        <div class="role">Sponsorship &amp; Outreach</div>
+        <p class="bio">Connects LYCC with sponsors, partners, and the broader Waterloo business community.</p>
+      </div>
+      <div class="team-card">
+        <div class="avatar blue">OE</div>
+        <h4>Organizer E</h4>
+        <div class="role">Marketing &amp; Design</div>
+        <p class="bio">Crafts the LYCC brand experience — from social media to the event visual identity.</p>
+      </div>
+      <div class="team-card" style="border-style: dashed; border-color: rgba(255,255,255,0.12);">
+        <div class="avatar" style="background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.1);">+</div>
+        <h4 style="color: var(--white-40);">Join the Team</h4>
+        <div class="role" style="color: rgba(255,255,255,0.3);">Open Positions</div>
+        <p class="bio">Interested in helping organize LYCC? We're looking for motivated students to join the team.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Laurier Youth Case Competition · Waterloo Region, Ontario</span>
+    <span>Made by high school students</span>
+  </footer>
+</div>
+
+<!-- ═══════════════ CONTACT PAGE ═══════════════ -->
+<div class="page" id="page-contact">
+  <div class="section">
+    <p class="section-label">Reach Out</p>
+    <h2 class="section-title">Contact Us</h2>
+    <p class="section-sub">Have a question about the competition, sponsorship, or just want to say hi? We'd love to hear from you.</p>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Get in touch</h3>
+        <p>Whether you're a student interested in competing, an organization looking to sponsor, or a professional interested in judging — reach out and we'll get back to you.</p>
+
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M2 5l8 6 8-6" stroke="#378add" stroke-width="1.3" stroke-linecap="round"/>
+              <rect x="2" y="4" width="16" height="13" rx="2" stroke="#378add" stroke-width="1.3"/>
+            </svg>
+          </div>
+          laurieryouthcasecomp@gmail.com
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2C7 2 5 4.5 5 7c0 4 5 10 5 10s5-6 5-10c0-2.5-2-5-5-5z" stroke="#378add" stroke-width="1.3"/>
+              <circle cx="10" cy="7" r="1.5" stroke="#378add" stroke-width="1.3"/>
+            </svg>
+          </div>
+          Waterloo Region, Ontario, Canada
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="5" width="16" height="12" rx="2" stroke="#378add" stroke-width="1.3"/>
+              <path d="M6 3h8M8 3v2m4-2v2" stroke="#378add" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          Fall 2026 — First Event
+        </div>
+
+        <div style="margin-top: 32px; padding: 20px 24px; background: rgba(55,138,221,0.06); border: 0.5px solid var(--accent-border); border-radius: 12px;">
+          <p style="font-size: 13px; color: var(--white-60); line-height: 1.7; margin: 0;">
+            <strong style="color: var(--white-80); display: block; margin-bottom: 6px; font-family: var(--font-display);">Interested in judging?</strong>
+            We're looking for university students, working professionals, and professors to serve on our judging panel. Select "Judging" as your topic below.
+          </p>
+        </div>
+      </div>
+
+      <form class="contact-form" action="mailto:info@lyccompetition.com?subject=Contact Form" method="post" enctype="text/plain">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" name="name" placeholder="Jane Smith" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" name="email" placeholder="jane@example.com" />
+        </div>
+        <div class="form-group">
+          <label>I'm reaching out about</label>
+          <select name="topic">
+            <option>Competing</option>
+            <option>Sponsorship</option>
+            <option>Judging</option>
+            <option>Joining the team</option>
+            <option>General Inquiry</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea name="message" placeholder="Tell us what's on your mind..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send Message</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Laurier Youth Case Competition · Waterloo Region, Ontario</span>
+    <span>Made by high school students</span>
+  </footer>
+</div>
+
+<!-- ═══════════════ NOTIFY MODAL ═══════════════ -->
+<div class="modal-overlay" id="notify-modal" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-form-content">
+      <h3>Stay in the loop</h3>
+      <p>Drop your email and we'll notify you when registration opens for LYCC Fall 2026.</p>
+      <form action="mailto:info@lyccompetition.com?subject=Notify Me" method="post" enctype="text/plain">
+        <div class="modal-input-row">
+          <input type="email" name="email" id="notify-email" placeholder="your@email.com" required />
+          <button type="submit">Notify me</button>
+        </div>
+      </form>
+    </div>
+    <div class="modal-success" id="modal-success">
+      <div class="modal-success-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12l5 5L19 7" stroke="#378add" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h4>You're on the list!</h4>
+      <p>We'll reach out as soon as registration opens. See you at LYCC 2026.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    const link = document.getElementById('nav-' + id);
+    if (link) link.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function openModal() {
+    document.getElementById('notify-modal').classList.add('open');
+    document.getElementById('modal-form-content').style.display = 'block';
+    document.getElementById('modal-success').style.display = 'none';
+  }
+
+  function closeModal() {
+    document.getElementById('notify-modal').classList.remove('open');
+  }
+
+  function closeModalOnOverlay(e) {
+    if (e.target === document.getElementById('notify-modal')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+</body>
+</html>
